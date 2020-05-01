@@ -1,0 +1,127 @@
+* endpoints: 
+
+    * obtener horarios citas medicas: 
+        metodo: GET
+        entradas: recive dos strings en la ruta, uno para el nombre de la ips y otro para la especializacion de la cita 
+                  como por ejemplo general, oftalmologo
+        ruta: http://dominio.com/horarios/<string:ips>/<string:espc>
+        salidas: retorna un json con el nro de consultorio, nombre del doctor, documento de doctor, y la fecha disponible
+        el formato de json es:
+
+            {
+                consultorio 1: [
+                    {
+                        nombre doctor: "mimi",
+                        documento doctor: "1231231",
+                        fecha cita: "dia-mes-año hora-minuto-segundo"
+                    },
+                    {
+                        nombre doctor: "mimi",
+                        documento doctor: "1231231",
+                        fecha cita: "dia-mes-año hora-minuto-segundo"
+                    }
+                ],
+
+                consultorio 2: [
+                    {
+                        nombre doctor: "banano",
+                        documento doctor: "123331231",
+                        fecha cita: "dia-mes-año hora-minuto-segundo"
+                    }
+                ]
+            }
+
+
+
+
+    *obtener todas las ips disponibles:
+        metodo: GET
+        entradas: ninguna
+        ruta: http://dominio.com/ips
+        salidas: retorna un json con el id de la ips, el nombre de la ips, direccion de la ips
+
+        {
+            1: {
+                nombre: "ips 1",
+                direccion: "direccion"
+            },
+            2: {
+                nombre: "ips 2",
+                direccion: "direccion"
+            },
+            3: {
+                nombre: "ips 3",
+                direccion: "direccion"
+            }
+        }
+
+
+
+
+    *obtener citas de un paciente:
+        metodo: GET
+        entradas: recive el numero de documento del paciente (entero)
+        ruta: http://dominio.com/horarios/<int:documento>
+        salidas: retorna un json con el nro de cita, la fecha, la ips, la direccion, medico, y la especializacion
+
+        {
+            1:{
+                fecha: "dia-mes-año hora-minuto-segundo",
+                ips: "ips 1"
+                direccion: "direccion",
+                medico: "medico",
+                especializacion: "especializacion"
+            },
+            2:{
+                fecha: "dia-mes-año hora-minuto-segundo",
+                ips: "ips 2"
+                direccion: "direccion",
+                medico: "medico",
+                especializacion: "especializacion"
+            },
+        }
+
+
+
+
+    * eliminar cita:
+        metodo: DELETE
+        entradas: recive el numero de cita (entero)
+        ruta: http://dominio.com/horarios/<int:nro_cita>
+        salidas: retorna un mensaje de confirmacion o uno de error en caso de que el numero de cita no exista
+
+        {'mensaje': 'la cita solicitada no exite'}
+        {'mensaje': 'cita eliminada'}
+
+
+
+
+    * agendar cita:
+        metodo: POST
+        entradas: recive un json con el siguiente formato
+            {
+                documento paciente: {
+                    fecha: "mes/dia/año hora:minuto:segundo",
+                    medico: "documento",
+                    ips: "ips 1",
+                }
+            }
+        ruta: http://dominio.com/cita
+        salidas: retorna un mensaje de confirmacion o de error
+
+
+
+
+
+    * obtener especializaciones por ips:
+        metodo: GET
+        entradas: recive el nombre de la ips como string
+        ruta: http://dominio.com/ips/<string:nombre_ips>
+        salidas: retorna un json con el siguiente formato
+
+            {
+                "nombre ips": [
+                    especializacion 1,
+                    especializacion 2
+                ]
+            }
