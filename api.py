@@ -2,7 +2,7 @@ import pymysql
 import json
 from datetime import datetime
 from flask import Flask, request
-from obtener_horarios import obtener_consultorios, generar_horarios
+from obtener_horarios import obtener_consultorios, generar_horarios, obtener_fechas
 
 #conexion base de datos
 conexion = pymysql.Connect(host='mysql-historiasclinicas.alwaysdata.net', 
@@ -231,6 +231,74 @@ def agendar_cita():
         return json.dumps({"mensaje": "el medico no existe"})
     else:
         return json.dumps({"mensaje": "la ips no existe"})
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/solicitud',  methods=['POST'])
+def modificar_cita():
+    global cursor, conexion
+    datos = request.json
+    temp = list(datos.keys())
+    id_paciente = int(temp[0])
+    info_cita = datos[temp[0]]
+    id_medico = int(info_cita["medico"])
+    n_fecha = info_cita["fecha"]
+    n_cita = int(info_cita["cita"])
+    n_fecha = datetime.strptime(n_fecha, '%m/%d/%y %H:%M:%S')
+    cursor.execute(
+        """
+        select nro_consultorio, fecha_inicial, fecha_final from medicos inner join consultorios on (medicos.nro_documento = consultorios.id_medico)
+        where medicos.nro_documento = %s
+        """,
+        (id_medico)
+    )
+    consulta = cursor.fetchall()
+    fechas = obtener_fechas(consulta[0][1], consulta[0][2])
+    cursor.execute(
+        """
+        select fecha from consultorios inner join horarios on (consultorios.nro_consultorio = horarios.id_consultorio)
+        where nro_consultorio = %s
+        """,
+        (consulta[0][0])
+    )
+    horarios = cursor.fetchall()
+    contador = 0
+    while contador < len(horarios):
+        fechas.remove(horarios[contador][0])
+        contador = contador + 1
+    if n_fecha in fechas:
+        cursor.execute(
+            """
+            delete from horarios where nro_cita = %s
+            """,
+            (n_cita)
+        )
+        conexion.commit()
+        cursor.execute(
+            """
+            select agendar_cita(%s, %s, %s, %s)
+            """,
+            (n_fecha, id_medico, info_cita["ips"], id_paciente)
+        )
+        consulta = cursor.fetchall()
+        consulta = consulta[0][0]
+        conexion.commit()
+        if consulta == 1:
+            return json.dumps({"mensaje": "se ha modificado la cita solicitada"})
+        else:
+            return json.dumps({"mensaje": "ha ocurrido un error"})
+    else:
+        return json.dumps({"mensaje": "el horario solicitado no esta disponible"})
+
 
 
 
