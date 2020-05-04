@@ -223,12 +223,10 @@ def agendar_cita():
     consulta = cursor.fetchall()
     consulta = consulta[0][0]
     conexion.commit()
-    if consulta == 1:
-        return json.dumps({"mensaje": "cita agendada correctamente"})
-    elif consulta == 0:
-        return json.dumps({"mensaje": "el medico no se encuentra en la ips"})
-    elif consulta == 2:
-        return json.dumps({"mensaje": "el medico no existe"})
+    if consulta != 0:
+        temp = {}
+        temp["nro cita"] = consulta
+        return json.dumps(temp)
     else:
         return json.dumps({"mensaje": "la ips no existe"})
 
