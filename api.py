@@ -70,8 +70,11 @@ def obtener_horarios(ips, espc):
             (ips, espc)
         )
         consulta = cursor.fetchall()
-        horarios = obtener_horarios3(consulta)
-        return json.dumps(horarios)
+        if len(consulta) != 0:
+            horarios = obtener_horarios3(consulta)
+            return json.dumps(horarios)
+        else:
+            return  json.dumps({"mensaje":"datos erroneos"})
 
 
 
