@@ -62,7 +62,7 @@ def generar_horarios(_consultorios, _consulta):
         temp = obtener_fechas_consultorio(_consultorios[contador1], _consulta)
         while contador2 < len(_consulta):
             if _consulta[contador2][0] == _consultorios[contador1]:
-                if verificar_fecha(_consulta[contador2][3], temp) == True or _consulta[contador2][3] <= now:
+                if verificar_fecha(_consulta[contador2][3], temp) == True or _consulta[contador2][3] < now:
                     temp.remove(_consulta[contador2][3])
             contador2 = contador2 + 1
         if len(temp) != 0:
