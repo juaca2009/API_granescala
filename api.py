@@ -2,7 +2,7 @@ import pymysql
 import json
 from datetime import datetime
 from flask import Flask, request
-from obtener_horarios import obtener_consultorios, generar_horarios, obtener_fechas
+from obtener_horarios import obtener_consultorios, generar_horarios, obtener_fechas, obtener_horarios2, obtener_horarios3
 
 #conexion base de datos
 conexion = pymysql.Connect(host='mysql-historiasclinicas.alwaysdata.net', 
@@ -36,12 +36,43 @@ def obtener_horarios(ips, espc):
     if len(consulta) != 0:
         consultorios = obtener_consultorios(consulta)
         horarios = generar_horarios(consultorios, consulta)
-        if len(horarios) != 0:
+        cursor.execute(
+            """
+            select nro_consultorio, fecha_inicial, fecha_final, medicos.nro_documento, medicos.nombres, especializaciones.nombre from especializaciones inner join medicos on (especializaciones.id_especializacion = medicos.id_espc)
+            inner join consultorios on (medicos.nro_documento = consultorios.id_medico) inner join ips on (consultorios.id_Ips = ips.id_ips)
+            where ips.nombre = %s and especializaciones.nombre = %s order by nro_consultorio
+            """,
+            (ips, espc)
+        )
+        consulta = cursor.fetchall()
+        consul_ya = list(horarios.keys())
+        contador = 0
+        consul = list()
+        while contador < len(consulta):
+            if not(consulta[contador][0] in consul_ya):
+                consul.append(consulta[contador][0])
+            contador = contador + 1
+        if len(consul) == 0 and len(horarios.keys()) != 0:
             return json.dumps(horarios)
+        elif len(consul) == 0 and len(horarios.keys()) == 0:
+            return  json.dumps({"mensaje":"no hay horarios disponibles"})
         else:
-            return json.dumps({"mensaje": "no hay horarios disponibles"})
+            horarios2 = obtener_horarios2(consul, consulta, horarios)
+            return json.dumps(horarios2)
+
     else:
-        return json.dumps({"mensaje":"no se encontraron resultados"})
+        cursor.execute(
+            """
+            select nro_consultorio, fecha_inicial, fecha_final, medicos.nro_documento, medicos.nombres, especializaciones.nombre from especializaciones inner join medicos on (especializaciones.id_especializacion = medicos.id_espc)
+            inner join consultorios on (medicos.nro_documento = consultorios.id_medico) inner join ips on (consultorios.id_Ips = ips.id_ips)
+            where ips.nombre = %s and especializaciones.nombre = %s order by nro_consultorio
+            """,
+            (ips, espc)
+        )
+        consulta = cursor.fetchall()
+        horarios = obtener_horarios3(consulta)
+        return json.dumps(horarios)
+
 
 
 

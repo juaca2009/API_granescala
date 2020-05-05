@@ -81,6 +81,60 @@ def generar_horarios(_consultorios, _consulta):
         contador1 = contador1 + 1
     return _horarios
 
+
+
+
+
+
+
+def obtener_horarios2(_consul, _consulta, _horarios):
+    contador = 0
+    contador2 = 0
+    contador3 = 0
+    while contador < len(_consul):
+        while contador2 < len(_consulta):
+            if _consul[contador] == _consulta[contador2][0]:
+                temp = obtener_fechas(_consulta[contador2][1], _consulta[contador2][2])
+                h_temp = list()
+                while contador3 < len(temp):
+                    plantilla = {
+                        'nombre doctor': _consulta[contador2][4], 
+                        'documento doctor': _consulta[contador2][3], 
+                        'fecha cita': temp[contador3].strftime("%d-%b-%Y %H:%M:%S")
+                    }
+                    h_temp.append(plantilla)
+                    contador3 = contador3 + 1
+                    print(len(h_temp))
+                _horarios[_consulta[contador2][0]] = h_temp
+            contador2 = contador2 + 1
+        contador = contador + 1
+    return _horarios
+
+
+
+
+
+
+def obtener_horarios3(_consulta):
+    contador = 0
+    contador2 = 0
+    _horarios = {}
+    while contador < len(_consulta):
+        temp = obtener_fechas(_consulta[contador][1], _consulta[contador][2])
+        h_temp = list()
+        while contador2 < len(temp):
+            plantilla = {
+                'nombre doctor': _consulta[contador][4], 
+                'documento doctor': _consulta[contador][3], 
+                'fecha cita': temp[contador2].strftime("%d-%b-%Y %H:%M:%S")
+            }
+            h_temp.append(plantilla)
+            contador2 = contador2 + 1
+        _horarios[_consulta[contador][0]] = h_temp
+        contador = contador + 1
+    return _horarios
+
+
         
 
 
