@@ -134,6 +134,7 @@ def obtener_especializaciones(nombre_ips):
         """,
         (nombre_ips)
     )
+    
     consulta = cursor.fetchall()
     consulta = consulta[0]
     if len(consulta) != 0:
