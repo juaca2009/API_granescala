@@ -206,6 +206,38 @@ def horarios_paciente(documento):
 
 
 
+@app.route('/horarios/<int:documento>/<int:nro_cita>')
+def obtener_cita_paciente(documento, nro_cita):
+    global cursor
+    cursor.execute(
+        """
+        select nro_cita, horarios.fecha, ips.nombre, ips.direccion, medicos.nombres, especializaciones.nombre from horarios
+        inner join consultorios on (horarios.id_consultorio = consultorios.nro_consultorio) 
+        inner join ips on (consultorios.id_Ips = ips.id_ips) inner join medicos on (consultorios.id_medico = medicos.nro_documento)
+        inner join especializaciones on (especializaciones.id_especializacion = medicos.id_espc)
+        where horarios.documento_paciente = %s and horarios.nro_cita = %s order by horarios.fecha
+        """,
+        (documento, nro_cita)
+    )
+    consulta = cursor.fetchall()
+    if len(consulta) != 0:
+        citas = list()
+        contador = 0
+        while contador < len(consulta):
+            plantilla = {
+                'id': consulta[contador][0],
+                'date': consulta[contador][1].strftime("%d-%b-%Y (%H:%M:%S)"),
+                'healthProviderInstitute': consulta[contador][2],
+                'address': consulta[contador][3],
+                'doctorName': consulta[contador][4],
+                'specialization': consulta[contador][5]
+            }
+            citas.append(plantilla)
+            contador = contador + 1
+        return json.dumps(citas)
+    else:
+        return json.dumps({'mensaje': 'no se encontro la cita'})
+
 
 
 
