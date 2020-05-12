@@ -127,26 +127,33 @@ def obtener_especializaciones(nombre_ips):
     global cursor
     cursor.execute(
         """
-        select especializaciones.nombre from ips inner join consultorios on (ips.id_ips = consultorios.id_Ips)
+        select nro_consultorio, especializaciones.nombre from ips inner join consultorios on (ips.id_ips = consultorios.id_Ips)
         inner join medicos on (consultorios.id_medico = medicos.nro_documento) 
         inner join especializaciones on (medicos.id_espc = especializaciones.id_especializacion)
-        where ips.nombre = %s group by especializaciones.nombre
+        where ips.nombre = %s
         """,
         (nombre_ips)
-    )
-
-    
+    )  
     consulta = cursor.fetchall()
-    consulta = consulta[0]
     if len(consulta) != 0:
         contador = 0
-        temp = list()
-        espc = {}
+        principal = list()
         while contador < len(consulta):
-            temp.append(consulta[contador])
+            nombre = "consultorio "
+            nombre = nombre + str(consulta[contador][0])
+            consultorio = {
+                "name": nombre,
+                "specialties": None
+            }
+            temp = list()
+            temp2 = {
+                "name": consulta[contador][1]
+            }
+            temp.append(temp2)
+            consultorio["specialties"] = temp
+            principal.append(consultorio)
             contador = contador + 1
-        espc[nombre_ips] = temp
-        return json.dumps(espc)
+        return json.dumps(principal)
     else:
         return json.dumps({"mensaje": "no se encontraron especializaciones"})
 
