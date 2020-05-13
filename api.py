@@ -283,24 +283,23 @@ def eliminar_cita(nro_cita):
 def agendar_cita():
     global cursor, conexion
     datos = request.json
-    temp = list(datos.keys())
-    id_paciente = int(temp[0])
-    temp = datos[temp[0]]
-    fecha = temp["fecha"]
-    fecha = datetime.strptime(fecha, '%m/%d/%y %H:%M:%S')
-    id_medico = int(temp["medico"])
+    id_paciente = int(datos["patientDocument"])
+    fecha = datos["date"]
+    fecha = datetime.strptime(fecha, '%b %d, %Y %H:%M:%S %p')
+    id_medico = int(datos["doctorDocument"])
     cursor.execute(
         """
         select agendar_cita(%s, %s, %s, %s)
         """,
-        (fecha, id_medico, temp["ips"], id_paciente)
+        (fecha, id_medico, datos["healthProviderInstituteName"], id_paciente)
     )
     consulta = cursor.fetchall()
     consulta = consulta[0][0]
     conexion.commit()
     if consulta != 0:
         temp = {}
-        temp["nro cita"] = consulta
+        temp["new id"] = consulta
+        temp["code"] = 201
         return json.dumps(temp)
     else:
         return json.dumps({"mensaje": "la ips no existe"})
