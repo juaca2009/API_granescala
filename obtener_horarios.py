@@ -54,11 +54,15 @@ def info_consultorio(_consu, _consulta):
 
 
 def generar_horarios(_consultorios, _consulta):
-    _horarios = {}
+    principal = list()
+    consultorio = {}
     contador1 = 0
     contador2 = 0
     now = datetime.now()
     while contador1 < len(_consultorios):
+        _info = info_consultorio(_consultorios[contador1], _consulta)
+        consultorio["name"] = "consultorio " + str(_info[0])
+        consultorio["availableAppointment"] = None
         temp = obtener_fechas_consultorio(_consultorios[contador1], _consulta)
         while contador2 < len(_consulta):
             if _consulta[contador2][0] == _consultorios[contador1]:
@@ -66,20 +70,20 @@ def generar_horarios(_consultorios, _consulta):
                     temp.remove(_consulta[contador2][3])
             contador2 = contador2 + 1
         if len(temp) != 0:
-            _info = info_consultorio(_consultorios[contador1], _consulta)
+            horarios = list()
             contador3 = 0
-            h_temp = list()
             while contador3 < len(temp):
                 plantilla = {
-                    'nombre doctor': _info[2], 
-                    'documento doctor': _info[1], 
-                    'fecha cita': temp[contador3].strftime("%d-%b-%Y %H:%M:%S")
+                    'doctorName': _info[2], 
+                    'doctorDocument': _info[1], 
+                    'date': temp[contador3].strftime("%d-%b-%Y %H:%M:%S")
                 }
-                h_temp.append(plantilla)
+                horarios.append(plantilla)
                 contador3 = contador3 + 1
-            _horarios[_info[0]] = h_temp
+            consultorio["availableAppointment"] = horarios      
+            principal.append(consultorio)     
         contador1 = contador1 + 1
-    return _horarios
+    return principal
 
 
 
@@ -91,22 +95,26 @@ def obtener_horarios2(_consul, _consulta, _horarios):
     contador = 0
     contador2 = 0
     contador3 = 0
+    consultorio = {}
     while contador < len(_consul):
         while contador2 < len(_consulta):
             if _consul[contador] == _consulta[contador2][0]:
+                consultorio["name"] = "consultorio " + str(_consulta[contador2][0])
+                consultorio["availableAppointment"] = None
                 temp = obtener_fechas(_consulta[contador2][1], _consulta[contador2][2])
-                h_temp = list()
+                horarios = list()
                 while contador3 < len(temp):
                     plantilla = {
-                        'nombre doctor': _consulta[contador2][4], 
-                        'documento doctor': _consulta[contador2][3], 
-                        'fecha cita': temp[contador3].strftime("%d-%b-%Y %H:%M:%S")
+                        'doctorName': _consulta[contador2][4], 
+                        'doctorDocument': _consulta[contador2][3], 
+                        'date': temp[contador3].strftime("%d-%b-%Y %H:%M:%S")
                     }
-                    h_temp.append(plantilla)
+                    horarios.append(plantilla)
                     contador3 = contador3 + 1
-                    print(len(h_temp))
-                _horarios[_consulta[contador2][0]] = h_temp
+                consultorio["availableAppointment"] = horarios
+                _horarios.append(consultorio)
             contador2 = contador2 + 1
+        
         contador = contador + 1
     return _horarios
 
@@ -117,25 +125,40 @@ def obtener_horarios2(_consul, _consulta, _horarios):
 
 def obtener_horarios3(_consulta):
     contador = 0
-    contador2 = 0
-    _horarios = {}
+    principal = list()
     while contador < len(_consulta):
+        consultorio = {}
+        consultorio["name"] = "consultorio " + str(_consulta[contador][0])
+        consultorio["availableAppointment"] = None
         temp = obtener_fechas(_consulta[contador][1], _consulta[contador][2])
-        h_temp = list()
+        horarios = list()
+        contador2 = 0
         while contador2 < len(temp):
             plantilla = {
-                'nombre doctor': _consulta[contador][4], 
-                'documento doctor': _consulta[contador][3], 
-                'fecha cita': temp[contador2].strftime("%d-%b-%Y %H:%M:%S")
+                'doctorName': _consulta[contador][4], 
+                'doctorDocument': _consulta[contador][3], 
+                'date': temp[contador2].strftime("%d-%b-%Y %H:%M:%S")
             }
-            h_temp.append(plantilla)
+            horarios.append(plantilla)
             contador2 = contador2 + 1
-        _horarios[_consulta[contador][0]] = h_temp
+        consultorio["availableAppointment"] = horarios
+        principal.append(consultorio)
         contador = contador + 1
-    return _horarios
+    return principal
 
 
-        
+
+
+
+
+def obtener_consultorios_faltantes(_consulta, _consultorios):
+    contador = 0
+    faltantes = list()
+    while contador < len(_consulta):
+        if not(_consulta[contador][0] in _consultorios):
+            faltantes.append(_consulta[contador][0])
+        contador = contador + 1
+    return faltantes
 
 
 

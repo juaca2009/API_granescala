@@ -2,7 +2,7 @@ import pymysql
 import json
 from datetime import datetime
 from flask import Flask, request
-from obtener_horarios import obtener_consultorios, generar_horarios, obtener_fechas, obtener_horarios2, obtener_horarios3
+from obtener_horarios import obtener_consultorios, generar_horarios, obtener_fechas, obtener_horarios2, obtener_horarios3, obtener_consultorios_faltantes
 
 #conexion base de datos
 conexion = pymysql.Connect(host='mysql-historiasclinicas.alwaysdata.net', 
@@ -45,16 +45,11 @@ def obtener_horarios(ips, espc):
             (ips, espc)
         )
         consulta = cursor.fetchall()
-        consul_ya = list(horarios.keys())
-        contador = 0
-        consul = list()
-        while contador < len(consulta):
-            if not(consulta[contador][0] in consul_ya):
-                consul.append(consulta[contador][0])
-            contador = contador + 1
-        if len(consul) == 0 and len(horarios.keys()) != 0:
+        consul = obtener_consultorios_faltantes(consulta, consultorios)
+        print(consul)
+        if len(consul) == 0 and len(horarios) != 0:
             return json.dumps(horarios)
-        elif len(consul) == 0 and len(horarios.keys()) == 0:
+        elif len(consul) == 0 and len(horarios) == 0:
             return  json.dumps({"mensaje":"no hay horarios disponibles"})
         else:
             horarios2 = obtener_horarios2(consul, consulta, horarios)
