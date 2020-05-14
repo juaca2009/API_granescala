@@ -162,10 +162,18 @@ def obtener_consultorios_faltantes(_consulta, _consultorios):
 
 
 
+def validar_enteros(valor):
+    try:
+        tempn = int(valor)
+    except ValueError:
+        tempn = None
+    if tempn != None:
+        return True
+    else:
+        return False
+
+
+
 
 if __name__ == '__main__':
-    fech1 = datetime(2020,4,1,7,0,0)
-    fech2 = datetime(2020,4,30,21,0,0)
-    fech3 = datetime(2021,4,1,7,0,0)
-    print(obtener_fechas(fech1, fech2))
-    #print(verificar_fecha(fech3, obtener_fechas(fech1, fech2)))
+    print(validar_enteros(""))
