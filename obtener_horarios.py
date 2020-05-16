@@ -17,9 +17,11 @@ def obtener_consultorios(_consulta):
 
 def obtener_fechas(fecha_inicial, fecha_final):
     fechas = list()
+    now = datetime.now()
     referencia = datetime(2020,1,1,21,0,0)
     while fecha_inicial <= fecha_final:
-        fechas.append(fecha_inicial)
+        if fecha_inicial > now:
+            fechas.append(fecha_inicial)
         fecha_inicial = fecha_inicial + timedelta(minutes=30)
         if fecha_inicial.hour == referencia.hour:
             fecha_inicial = fecha_inicial + timedelta(hours=10)
@@ -58,7 +60,6 @@ def generar_horarios(_consultorios, _consulta):
     consultorio = {}
     contador1 = 0
     contador2 = 0
-    now = datetime.now()
     while contador1 < len(_consultorios):
         _info = info_consultorio(_consultorios[contador1], _consulta)
         consultorio["name"] = "consultorio " + str(_info[0])
@@ -66,7 +67,7 @@ def generar_horarios(_consultorios, _consulta):
         temp = obtener_fechas_consultorio(_consultorios[contador1], _consulta)
         while contador2 < len(_consulta):
             if _consulta[contador2][0] == _consultorios[contador1]:
-                if verificar_fecha(_consulta[contador2][3], temp) == True or _consulta[contador2][3] < now:
+                if verificar_fecha(_consulta[contador2][3], temp) == True:
                     temp.remove(_consulta[contador2][3])
             contador2 = contador2 + 1
         if len(temp) != 0:

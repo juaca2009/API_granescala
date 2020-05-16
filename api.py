@@ -46,7 +46,6 @@ def obtener_horarios(ips, espc):
         )
         consulta = cursor.fetchall()
         consul = obtener_consultorios_faltantes(consulta, consultorios)
-        print(consul)
         if len(consul) == 0 and len(horarios) != 0:
             return json.dumps(horarios)
         elif len(consul) == 0 and len(horarios) == 0:
