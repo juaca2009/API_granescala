@@ -1,7 +1,7 @@
 import pymysql
 import json
 from datetime import datetime
-from flask import Flask, request
+from flask import Flask, request, Response
 from obtener_horarios import obtener_consultorios, generar_horarios, obtener_fechas, obtener_horarios2, obtener_horarios3, obtener_consultorios_faltantes, validar_enteros
 
 #conexion base de datos
@@ -47,12 +47,12 @@ def obtener_horarios(ips, espc):
         consulta = cursor.fetchall()
         consul = obtener_consultorios_faltantes(consulta, consultorios)
         if len(consul) == 0 and len(horarios) != 0:
-            return json.dumps(horarios)
+            return Response(json.dumps(horarios), mimetype='application/json')
         elif len(consul) == 0 and len(horarios) == 0:
-            return  json.dumps({"mensaje":"no hay horarios disponibles"})
+            return Response(json.dumps({"mensaje":"no hay horarios disponibles"}), mimetype='application/json')
         else:
             horarios2 = obtener_horarios2(consul, consulta, horarios)
-            return json.dumps(horarios2)
+            return Response(json.dumps(horarios2), mimetype='application/json')
 
     else:
         cursor.execute(
@@ -66,9 +66,9 @@ def obtener_horarios(ips, espc):
         consulta = cursor.fetchall()
         if len(consulta) != 0:
             horarios = obtener_horarios3(consulta)
-            return json.dumps(horarios)
+            return Response(json.dumps(horarios), mimetype='application/json')
         else:
-            return  json.dumps({"mensaje":"datos erroneos"})
+            return Response(json.dumps({"mensaje":"datos erroneos"}), mimetype='application/json')
 
 
 
@@ -102,9 +102,9 @@ def obtener_ips():
             }
             principal.append(ips)
             contador = contador + 1
-        return json.dumps(principal)
+        return Response(json.dumps(principal), mimetype='application/json')
     else:
-        return json.dumps({'mensaje':"no hay ips en la base de datos"})
+        return Response(json.dumps({'mensaje':"no hay ips en la base de datos"}), mimetype='application/json')
 
 
 
@@ -147,9 +147,9 @@ def obtener_especializaciones(nombre_ips):
             consultorio["specialties"] = temp
             principal.append(consultorio)
             contador = contador + 1
-        return json.dumps(principal)
+        return Response(json.dumps(principal), mimetype='application/json')
     else:
-        return json.dumps({"mensaje": "no se encontraron especializaciones"})
+        return Response(json.dumps({"mensaje": "no se encontraron especializaciones"}), mimetype='application/json')
 
 
 
@@ -190,9 +190,9 @@ def horarios_paciente(documento):
             }
             citas.append(plantilla)
             contador = contador + 1
-        return json.dumps(citas)
+        return Response(json.dumps(citas), mimetype='application/json')
     else:
-        return json.dumps({'mensaje': 'no hay citas para este paciente'})
+        return Response(json.dumps({'mensaje': 'no hay citas para este paciente'}), mimetype='application/json')
 
 
 
@@ -228,9 +228,9 @@ def obtener_cita_paciente(documento, nro_cita):
             }
             citas.append(plantilla)
             contador = contador + 1
-        return json.dumps(citas)
+        return Response(json.dumps(citas), mimetype='application/json')
     else:
-        return json.dumps({'mensaje': 'no se encontro la cita'})
+        return Response(json.dumps({'mensaje': 'no se encontro la cita'}), mimetype='application/json')
 
 
 
@@ -258,9 +258,9 @@ def eliminar_cita(nro_cita):
             (nro_cita)
         )
         conexion.commit()
-        return json.dumps({'mensaje': 'cita eliminada'})
+        return Response(json.dumps({'mensaje': 'cita eliminada'}), mimetype='application/json')
     else:
-        return json.dumps({'mensaje': 'la cita solicitada no exite'})
+        return Response(json.dumps({'mensaje': 'la cita solicitada no exite'}), mimetype='application/json')
 
 
 
@@ -297,11 +297,11 @@ def agendar_cita():
             temp = {}
             temp["new id"] = consulta
             temp["code"] = 201
-            return json.dumps(temp)
+            return Response(json.dumps(temp), mimetype='application/json')
         else:
-            return json.dumps({"code": 406})
+            return Response(json.dumps({"code": 406}), mimetype='application/json')
     else:
-        return json.dumps({"code": 409})
+        return Response(json.dumps({"code": 409}), mimetype='application/json')
 
 
 
@@ -366,13 +366,13 @@ def modificar_cita():
             consulta = consulta[0][0]
             conexion.commit()
             if consulta == 1:
-                return json.dumps({"code": 201})
+                return Response(json.dumps({"code": 201}), mimetype='application/json')
             else:
-                return json.dumps({"code": 409})
+                return Response(json.dumps({"code": 409}), mimetype='application/json')
         else:
-            return json.dumps({"code": 406})
+            return Response(json.dumps({"code": 406}), mimetype='application/json')
     else:
-        return json.dumps({"code": 409})
+        return Response(json.dumps({"code": 409}), mimetype='application/json')
 
 
 
