@@ -273,6 +273,7 @@ def eliminar_cita(nro_cita):
 
 
 
+
 @app.route('/horarios', methods=['POST'])
 def agendar_cita():
     global cursor, conexion
